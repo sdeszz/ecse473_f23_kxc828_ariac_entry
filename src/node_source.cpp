@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     ROS_ERROR("%s", ex.what());
     } 
     
-    part_pose.pose = goal_pose.pose;
+    goal_pose.pose = part_pose.pose;
     goal_pose.pose.position.z += 0.10;
     goal_pose.pose.orientation.w = 0.707;
     goal_pose.pose.orientation.x = 0.0;
