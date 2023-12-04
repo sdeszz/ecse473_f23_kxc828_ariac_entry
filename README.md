@@ -14,7 +14,7 @@ README.md: Documentation file.
 
 # Dependencies
 This package requires ROS and the ARIAC 2019 environment. To install them, use following commands:
-'''
+```
 mkdir -p ~/ecse_373_ariac_ws/src
 cd ~/ecse_373_ariac_ws/src
 git clone https://github.com/cwru-eecs-373/ecse_373_ariac.git
@@ -22,7 +22,7 @@ rosdep install --from-paths ecse_373_ariac --ignore-src -r -y
 cd ../
 catkin_make
 source devel/setup.bash
-'''
+```
 
 Note: Ensure all dependencies are installed before launching the package.
 
@@ -39,17 +39,17 @@ ROS Warning Message: Prints the part's pose in specified reference frames upon r
 
 # Installation and Launching
 Clone the repository:
-'''
+```
 git clone https://github.com/sdeszz/ecse473_f23_kxc828_ariac_entry.git
-'''
+```
 Build the package using catkin_make:
-'''
+```
 cd [your_ros_workspace]
 catkin_make
-'''
+```
 Launch the package:
-'''
+```
 roslaunch ecse473_f23_kxc828_ariac_entry entry.launch
-'''
+```
 
 For more information on ARIAC, visit the ARIAC 2019 Documentation.
