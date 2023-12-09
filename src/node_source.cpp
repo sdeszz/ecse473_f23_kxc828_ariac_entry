@@ -223,9 +223,9 @@ int main(int argc, char **argv)
     //goal_pose.pose.orientation.y = 0.707;
     //goal_pose.pose.orientation.z = 0.0;
     
-    T_des[0][3] = 0.5;//goal_pose.pose.position.x;
-    T_des[1][3] = 0;//goal_pose.pose.position.y;
-    T_des[2][3] = 0;//goal_pose.pose.position.z; // above part
+    T_des[0][3] = goal_pose.pose.position.x;
+    T_des[1][3] = goal_pose.pose.position.y;
+    T_des[2][3] = goal_pose.pose.position.z; // above part
     T_des[3][3] = 1.0;
     // The orientation of the end effector so that the end effector is down.
     T_des[0][0] = 0.0; T_des[0][1] = -1.0; T_des[0][2] = 0.0;
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
     anotherpart_pose.position.x = goal_pose.pose.position.x;
     anotherpart_pose.position.y = goal_pose.pose.position.y;
     anotherpart_pose.position.z = goal_pose.pose.position.z;
-    ROS_INFO("goalx:%f goaly:%f goalz:%f",goal_pose.pose.position.x,goal_pose.pose.position.y,goal_pose.pose.position.z);
+    ROS_INFO("state velocity x:%f state velocity y:%f state velocity z:%f",join[flaga-1].velocity[6],join[flaga-1].velocity[6],join[flaga-1].velocity[6]);
     //anotherpart_pose.position.x = 0.5;
     anotherpart_pose.orientation.w = 0.707;
     anotherpart_pose.orientation.x = 0.0;
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
     ik_pose.request.part_pose = anotherpart_pose;
     if (ik_client.call(ik_pose)){
     //ROS_INFO("Call to ik_service returned [%i] solutions", ik_pose.response.num_sols);
-      ROS_INFO("!!:%d!!%d",ik_pose.response.num_sols,num_sols);
+      //ROS_INFO("!!:%d!!%d",ik_pose.response.num_sols,num_sols);
       if(ik_pose.response.num_sols > 0 && ik_pose.response.num_sols <= 8){
       //ROS_INFO("Ik_service solution lisr: angle1: %f,angle2: %f,angle3: %f,angle4: %f,angle5: %f,angle6: %f", ik_pose.response.joint_solutions[0].joint_angles[0],ik_pose.response.joint_solutions[0].joint_angles[1],ik_pose.response.joint_solutions[0].joint_angles[2],ik_pose.response.joint_solutions[0].joint_angles[3],ik_pose.response.joint_solutions[0].joint_angles[4],ik_pose.response.joint_solutions[0].joint_angles[5]);
         for(int i = 0; i<8; i++){
@@ -290,8 +290,8 @@ int main(int argc, char **argv)
     traj.points[1].positions[0] = join[flaga-1].position[1];
     
     for (int indy = 0; indy < 6; indy++) {
-      traj.points[1].positions[indy + 1] = q_des[soluN][indy];
-      //traj.points[1].positions[indy + 1] = ik_pose.response.joint_solutions[soluN].joint_angles[indy];
+      //traj.points[1].positions[indy + 1] = q_des[soluN][indy];
+      traj.points[1].positions[indy + 1] = ik_pose.response.joint_solutions[soluN].joint_angles[indy];
     }
     
     traj.points[1].time_from_start = ros::Duration(1.0);
