@@ -1,46 +1,69 @@
-# ECSE473 F23 KXC828 ARIAC Entry Package
-This repository contains the ecse473_f23_kxc828_ariac_entry package for the ARIAC competition. This ROS package is designed to interface with the ARIAC simulation environment, manage robotic operations, and handle tasks specified for the competition.
+# Laboratory 5-7 ARIAC 2019 Competition
 
-# Package Structure
-The package includes the following directories and files:
+This repository contains the ecse473_f23_kxc828_ariac_entry package for the ARIAC competition. This ROS package is designed to interface with the ARIAC simulation environment, manage robotic operations, and handle tasks specified for the competition. This submission marks the conclusion of the ARIAC competition. The success of this laboratory project is contingent upon the groundwork laid in Lab 6, where solutions for inverse kinematics were computed. 
 
-launch/
-second.launch: Launch file to start the package.
-src/
-node_source.cpp: Source code for the ROS nodes.
-CMakeLists.txt: CMake configuration file.
-package.xml: Package metadata file.
-README.md: Documentation file.
+# Problems with the current node
+# Lab5 
 
-# Dependencies
-This package requires ROS and the ARIAC 2019 environment. To install them, use following commands:
+In lab5 all the functions work.
+
+# Lab7
+Now the robot's robotic arm is able to move to any specified position that has a SOLUTION, I think I'm correct with my IK, but I'm a little confused as to where this robotic arm is getting the end position from. The action server implementation can not be completed for some reason.
+
+# Install Simulation Environment
+
 ```
-mkdir -p ~/ecse_373_ariac_ws/src
-cd ~/ecse_373_ariac_ws/src
-git clone https://github.com/cwru-eecs-373/ecse_373_ariac.git
-rosdep install --from-paths ecse_373_ariac --ignore-src -r -y
+mkdir -p ~/ariac_ws/src
+cd ~/ariac_ws/src
+git clone https://github.com/cwru-eecs-373/cwru_ariac_2019.git
+rosdep install --from-paths cwru_ariac_2019 --ignore-src -r -y
 cd ../
-catkin_make
-source devel/setup.bash
+sudo -- /bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic install"
 ```
 
-Note: Ensure all dependencies are installed before launching the package.
+The ARIAC Simulation does not work on its own at this time. It must be invoked through another package. That package should be built in its own workspace so that it is not conflated with the simulator itself.
 
-Functionality
-The package provides the following functionalities:
 
-Start the Competition: Initiates the ARIAC competition.
-Strong error messaging for failed service calls.
-Informative messages for unsuccessful attempts.
-Subscribe to the Orders Topic: Listens for incoming orders.
-Material Location Service: Locates bins with required parts.
-Logical Cameras Subscription: Stores and processes camera data.
-ROS Warning Message: Prints the part's pose in specified reference frames upon receiving an order.
+# Fixing bug
 
-# Installation and Launching
-Clone the repository:
+When executing the launch file for the initial time, it may encounter issues due to a bug in the "empy" module for Python3. There are two alternative solutions to address this problem. First, you can resolve it by employing the following method:
+
 ```
-git clone https://github.com/sdeszz/ecse473_f23_kxc828_ariac_entry.git
+roslaunch ecse_373_ariac ecse_373_ariac.launch python:=false
+```
+
+However, the first method is inefficient, so we can use the second method instead:
+
+```
+sudo patch /usr/lib/python3/dist-packages/em.py < `rospack find ecse_373_ariac`/patches/empy.patch
+```
+
+This approach involves applying a patch to the "em.py" file within the Python3 empy module. This corrective action ensures a thorough and permanent resolution to the existing bug.
+
+# Launch Competition Environment
+
+We can use this command to launch ARIAC 2019
+
+```
+roslaunch ariac_entry competition.launch
+```
+
+we can use this command to kill the launch properly and quickly
+
+```
+killall gzserver gzclient roslaunch
+```
+
+
+The environment does not initialize correctly upon launch; it requires manual intervention by pressing the play button located at the bottom-middle left of the screen to initiate proper startup.
+
+# Run the ARIAC 2019 Competition Node
+
+We can use this command to run the competition
+```
+roslaunch ariac_entry competition.launch
+```
+
 ```
 Build the package using catkin_make:
 ```
