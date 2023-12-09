@@ -16,6 +16,9 @@
 #include "sensor_msgs/JointState.h"
 #include "trajectory_msgs/JointTrajectory.h"
 #include "ur_kinematics/ur_kin.h"
+#include "actionlib/client/simple_action_client.h"
+#include "actionlib/client/terminal_state.h"
+#include "control_msgs/FollowJointTrajectoryAction.h"
 #include <sstream>
 
 trajectory_msgs::JointTrajectory move, traj;
@@ -108,6 +111,18 @@ void infoCallback(const ros::TimerEvent& event) {
     }
 }
 
+/*void goalActiveCallback() {
+
+}
+
+void feedbackCallback(const control_msgs::JointTrajectoryFeedbackConstPtr& fb) {
+
+}
+
+void resultCallback(const control_msgs::JointTrajectoryResultConstPtr& res) {
+
+}
+*/
 int main(int argc, char **argv)
 {
   std_srvs::Trigger begin_comp;
@@ -122,6 +137,8 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   ik_service::PoseIK ik_pose;
   geometry_msgs::Pose anotherpart_pose;
+  control_msgs::FollowJointTrajectoryAction joint_trajectory_as;
+  
   ros::Timer timer = n.createTimer(ros::Duration(10.0), infoCallback);
   ros::Subscriber sub = n.subscribe<osrf_gear::Order>("/ariac/orders", 1000, chatterCallback);
   ros::Subscriber asub = n.subscribe<osrf_gear::LogicalCameraImage>("/ariac/logical_camera_bin1", 1000, cameraaCallback);
@@ -135,6 +152,9 @@ int main(int argc, char **argv)
   ros::ServiceClient begin_client = n.serviceClient<std_srvs::Trigger>("/ariac/start_competition");  
   ros::ServiceClient begin_anclient = n.serviceClient<osrf_gear::GetMaterialLocations>("/ariac/material_locations"); 
   ros::ServiceClient ik_client = n.serviceClient<ik_service::PoseIK>("/pose_ik");
+  actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>trajectory_ac("ariac/arm/follow_joint_trajectory", true);
+  //trajectory_ac.sendGoal(goal, &resultCallback, &goalActiveCallback, &feedbackCallback);
+  
   bool service_available = ros::service::waitForService("/pose_ik",ros::Duration(10.0));
   ROS_INFO("service_available ? %d", service_available);
   
@@ -145,6 +165,7 @@ int main(int argc, char **argv)
   
   servise_geta_succeeded = begin_anclient.call(my_get);
   
+  //joint_trajectory_as.action_goal.goal.trajectory = joint_trajectory_as;
   //ROS_INFO("response unit: %s", type[0].type.c_str());
   
   if(begin_comp.response.success)ROS_INFO("Competition service called successfully: %s", begin_comp.response.message.c_str());
@@ -246,7 +267,7 @@ int main(int argc, char **argv)
     ik_pose.request.part_pose = anotherpart_pose;
     if (ik_client.call(ik_pose)){
     //ROS_INFO("Call to ik_service returned [%i] solutions", ik_pose.response.num_sols);
-      //ROS_INFO("!!:%d!!%d",ik_pose.response.num_sols,num_sols);
+      ROS_INFO("The total number of solutions:%d",ik_pose.response.num_sols);
       if(ik_pose.response.num_sols > 0 && ik_pose.response.num_sols <= 8){
       //ROS_INFO("Ik_service solution lisr: angle1: %f,angle2: %f,angle3: %f,angle4: %f,angle5: %f,angle6: %f", ik_pose.response.joint_solutions[0].joint_angles[0],ik_pose.response.joint_solutions[0].joint_angles[1],ik_pose.response.joint_solutions[0].joint_angles[2],ik_pose.response.joint_solutions[0].joint_angles[3],ik_pose.response.joint_solutions[0].joint_angles[4],ik_pose.response.joint_solutions[0].joint_angles[5]);
         for(int i = 0; i<8; i++){
@@ -257,6 +278,9 @@ int main(int argc, char **argv)
           break;
           }
         }
+      }
+      else{
+        ROS_INFO("The goal is not reachable!");
       }
     }
     
